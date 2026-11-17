@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f7fb">
+  <meta name="description" content="Metinlerinizi kolayca tekrarlayın, süsleyin ve kopyalayın.">
+  <title>Text Repeater — Metin Tekrarlayıcı</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #20243a;
+      --muted: #788096;
+      --line: #e8eaf2;
+      --surface: #fff;
+      --page: #f6f7fb;
+      --primary: #6258e8;
+      --primary-dark: #5146d5;
+      --soft: #f0efff;
+      --shadow: 0 18px 48px rgba(37, 43, 82, .09), 0 2px 8px rgba(37, 43, 82, .04);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      min-height: 100vh;
+      color: var(--ink);
+      background: radial-gradient(ellipse at 50% -15%, #eeedff 0, transparent 43%), var(--page);
+    }
+    button, input, textarea, select { font: inherit; }
+    button { cursor: pointer; }
+    .page { width: min(100% - 32px, 920px); margin: 0 auto; padding: 48px 0 40px; }
+    header { text-align: center; margin-bottom: 30px; }
+    .brand-mark {
+      display: inline-grid; place-items: center; width: 52px; height: 52px; margin-bottom: 14px;
+      border-radius: 17px; color: white; font-size: 25px;
+      background: linear-gradient(140deg, #8279ff, #5d50dd); box-shadow: 0 9px 22px #6258e842;
+    }
+    h1 { margin: 0; font-size: clamp(27px, 5vw, 37px); letter-spacing: -.045em; }
+    header p { margin: 9px 0 0; color: var(--muted); font-size: 15px; }
+    .app {
+      display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px;
+      padding: 22px; border: 1px solid rgba(255,255,255,.9); border-radius: 24px;
+      background: rgba(255,255,255,.92); box-shadow: var(--shadow);
+    }
+    .panel { min-width: 0; }
+    .field { margin-bottom: 20px; }
+    .label-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 9px; }
+    label, .field-title { color: #33384f; font-size: 13px; font-weight: 700; }
+    .hint { color: var(--muted); font-size: 12px; font-weight: 500; }
+    textarea, input[type="number"], input[type="text"], select {
+      width: 100%; color: var(--ink); border: 1px solid var(--line); border-radius: 12px;
+      background: #fff; outline: none; transition: border-color .16s, box-shadow .16s;
+    }
+    textarea { display: block; min-height: 142px; padding: 13px 14px; resize: vertical; line-height: 1.55; }
+    textarea::placeholder, input::placeholder { color: #a7adbd; }
+    textarea:focus, input:focus, select:focus { border-color: #928bff; box-shadow: 0 0 0 3px #6258e81b; }
+    .inline { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    input[type="number"], input[type="text"], select { height: 44px; padding: 0 12px; }
+    .number-wrap { position: relative; }
+    .number-wrap input { padding-right: 58px; }
+    .number-wrap .max { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #9aa0b1; font-size: 11px; pointer-events: none; }
+    .custom-separator { display: none; margin-top: 10px; }
+    .custom-separator.visible { display: block; }
+    .decorations { padding: 14px; border: 1px solid var(--line); border-radius: 14px; background: #fcfcfe; }
+    .decorations .field-title { display: block; margin-bottom: 12px; }
+    .icon-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .icon-group > span { display: block; margin-bottom: 7px; color: var(--muted); font-size: 11px; font-weight: 650; }
+    .icon-list { display: flex; flex-wrap: wrap; gap: 5px; }
+    .icon-btn {
+      display: grid; place-items: center; min-width: 33px; height: 32px; padding: 0 6px;
+      border: 1px solid var(--line); border-radius: 9px; background: #fff; font-size: 16px;
+      transition: .15s ease;
+    }
+    .icon-btn:hover { border-color: #bcb7ff; background: var(--soft); transform: translateY(-1px); }
+    .icon-btn:active { transform: scale(.96); }
+    .checks { display: flex; flex-wrap: wrap; gap: 12px 18px; margin-top: 14px; }
+    .check { display: inline-flex; align-items: center; gap: 7px; color: #555b70; font-size: 12px; font-weight: 550; cursor: pointer; }
+    .check input { width: 15px; height: 15px; margin: 0; accent-color: var(--primary); }
+    .actions { display: flex; gap: 10px; margin-top: 20px; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 45px;
+      padding: 0 16px; border: 0; border-radius: 12px; font-size: 13px; font-weight: 700;
+      transition: transform .15s, background .15s, box-shadow .15s;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+    .btn-primary { flex: 1; color: #fff; background: var(--primary); box-shadow: 0 6px 14px #6258e82e; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-quiet { color: #646a7d; border: 1px solid var(--line); background: white; }
+    .btn-quiet:hover { background: #f8f8fc; }
+    .output-head { display: flex; justify-content: space-between; align-items: center; margin: 1px 0 9px; }
+    .output-title { font-size: 13px; font-weight: 700; }
+    .copy-btn { min-height: 34px; padding: 0 11px; color: var(--primary); border: 1px solid #e1dfff; border-radius: 9px; background: var(--soft); font-size: 12px; font-weight: 700; }
+    .copy-btn:hover { background: #e8e6ff; }
+    #output { min-height: 321px; height: 321px; background: #fbfbfd; font-size: 13px; }
+    .stats { display: flex; gap: 8px; margin-top: 11px; }
+    .stat { flex: 1; padding: 10px 12px; border-radius: 11px; background: #f7f7fc; }
+    .stat strong { display: block; font-size: 16px; letter-spacing: -.02em; }
+    .stat span { color: var(--muted); font-size: 11px; }
+    .toast {
+      position: fixed; left: 50%; bottom: 25px; z-index: 3; padding: 11px 17px;
+      color: #fff; border-radius: 11px; background: #272b40; box-shadow: 0 8px 25px #20243a38;
+      font-size: 13px; font-weight: 650; opacity: 0; transform: translate(-50%, 10px); pointer-events: none;
+      transition: .2s ease;
+    }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    footer { padding-top: 18px; color: #9399a9; text-align: center; font-size: 12px; }
+    @media (max-width: 680px) {
+      .page { width: min(100% - 22px, 520px); padding-top: 30px; }
+      header { margin-bottom: 22px; }
+      .app { grid-template-columns: 1fr; gap: 25px; padding: 16px; border-radius: 19px; }
+      #output { min-height: 230px; height: 230px; }
+      .field { margin-bottom: 17px; }
+    }
+    @media (max-width: 390px) {
+      .inline { grid-template-columns: 1fr; gap: 13px; }
+      .icon-controls { gap: 8px; }
+      .actions .btn { padding: 0 11px; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; } }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header>
+      <div class="brand-mark" aria-hidden="true">↻</div>
+      <h1>Text Repeater</h1>
+      <p>Metnini yaz, tekrar sayısını belirle — gerisini biz halledelim.</p>
+    </header>
+
+    <section class="app" aria-label="Metin tekrarlayıcı">
+      <div class="panel">
+        <div class="field">
+          <div class="label-row"><label for="source">Metniniz</label><span class="hint">Tekrarlanacak metni yazın</span></div>
+          <textarea id="source" placeholder="Örnek: Merhaba dünya!" spellcheck="false"></textarea>
+        </div>
+
+        <div class="field inline">
+          <div>
+            <div class="label-row"><label for="repeatCount">Tekrar sayısı</label></div>
+            <div class="number-wrap">
+              <input id="repeatCount" type="number" value="5" min="1" max="10000" inputmode="numeric" aria-describedby="countHint">
+              <span class="max">/ 10.000</span>
+            </div>
+          </div>
+          <div>
+            <div class="label-row"><label for="separator">Ayırıcı</label></div>
+            <select id="separator">
+              <option value="newline">Yeni satır</option>
+              <option value="space">Boşluk</option>
+              <option value="comma">Virgül</option>
+              <option value="custom">Özel ayırıcı</option>
+            </select>
+            <div id="customWrap" class="custom-separator"><input id="customSeparator" type="text" placeholder="Ayırıcıyı yazın" aria-label="Özel ayırıcı"></div>
+          </div>
+        </div>
+
+        <div class="decorations">
+          <span class="field-title">Metne simge ekle</span>
+          <div class="icon-controls">
+            <div class="icon-group"><span>Başına ekle</span><div class="icon-list" data-target="prefix" aria-label="Metnin başına simge ekle"></div></div>
+            <div class="icon-group"><span>Sonuna ekle</span><div class="icon-list" data-target="suffix" aria-label="Metnin sonuna simge ekle"></div></div>
+          </div>
+          <div class="checks">
+            <label class="check"><input id="numbered" type="checkbox"> Sıralı numara ekle</label>
+            <label class="check"><input id="reverse" type="checkbox"> Metni ters çevir</label>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="generate" class="btn btn-primary" type="button"><span aria-hidden="true">✦</span> Metni oluştur</button>
+          <button id="clear" class="btn btn-quiet" type="button"><span aria-hidden="true">⌫</span> Temizle</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="output-head">
+          <label class="output-title" for="output">Sonuç</label>
+          <button id="copy" class="copy-btn" type="button"><span aria-hidden="true">▢</span> Kopyala</button>
+        </div>
+        <textarea id="output" readonly placeholder="Oluşturduğunuz metin burada görünecek..." aria-live="polite"></textarea>
+        <div class="stats" aria-label="Metin istatistikleri">
+          <div class="stat"><strong id="charCount">0</strong><span>Karakter</span></div>
+          <div class="stat"><strong id="wordCount">0</strong><span>Kelime</span></div>
+        </div>
+      </div>
+    </section>
+    <footer>Ücretsiz, hızlı ve tamamen tarayıcınızda çalışır.</footer>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      const icons = ['✨', '🔥', '👑', '★', '⚡'];
+      const selected = { prefix: '', suffix: '' };
+      const source = document.querySelector('#source');
+      const output = document.querySelector('#output');
+      const count = document.querySelector('#repeatCount');
+      const separator = document.querySelector('#separator');
+      const customWrap = document.querySelector('#customWrap');
+      const customSeparator = document.querySelector('#customSeparator');
+      const numbered = document.querySelector('#numbered');
+      const reverse = document.querySelector('#reverse');
+      const charCount = document.querySelector('#charCount');
+      const wordCount = document.querySelector('#wordCount');
+      const toast = document.querySelector('#toast');
+      let toastTimer;
+
+      document.querySelectorAll('.icon-list').forEach(group => {
+        const target = group.dataset.target;
+        icons.forEach(icon => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'icon-btn';
+          button.textContent = icon;
+          button.title = `${icon} ${target === 'prefix' ? 'başına' : 'sonuna'} ekle`;
+          button.setAttribute('aria-label', button.title);
+          button.addEventListener('click', () => {
+            selected[target] += icon;
+            button.setAttribute('aria-pressed', 'true');
+            button.style.borderColor = '#928bff';
+            button.style.background = '#f0efff';
+            generate();
+          });
+          group.append(button);
+        });
+      });
+
+      function getSeparator() {
+        switch (separator.value) {
+          case 'space': return ' ';
+          case 'comma': return ', ';
+          case 'custom': return customSeparator.value;
+          default: return '\n';
+        }
+      }
+
+      function generate() {
+        const rawCount = Number.parseInt(count.value, 10);
+        const repeatCount = Number.isFinite(rawCount) ? Math.min(10000, Math.max(1, rawCount)) : 1;
+        count.value = repeatCount;
+        const text = source.value;
+        if (!text) {
+          output.value = '';
+          updateStats('');
+          return;
+        }
+        const repeated = Array.from({ length: repeatCount }, (_, index) => {
+          let value = reverse.checked ? Array.from(text).reverse().join('') : text;
+          value = selected.prefix + value + selected.suffix;
+          return numbered.checked ? `${index + 1}. ${value}` : value;
+        });
+        const result = repeated.join(getSeparator());
+        output.value = result;
+        updateStats(result);
+      }
+
+      function updateStats(text) {
+        charCount.textContent = Array.from(text).length.toLocaleString('tr-TR');
+        const words = text.trim() ? text.trim().split(/\s+/u).length : 0;
+        wordCount.textContent = words.toLocaleString('tr-TR');
+      }
+
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove('show'), 1900);
+      }
+
+      document.querySelector('#generate').addEventListener('click', generate);
+      [source, count, separator, customSeparator, numbered, reverse].forEach(element => {
+        element.addEventListener('input', generate);
+        element.addEventListener('change', generate);
+      });
+      separator.addEventListener('change', () => {
+        customWrap.classList.toggle('visible', separator.value === 'custom');
+      });
+      document.querySelector('#clear').addEventListener('click', () => {
+        source.value = '';
+        count.value = 5;
+        separator.value = 'newline';
+        customSeparator.value = '';
+        customWrap.classList.remove('visible');
+        numbered.checked = false;
+        reverse.checked = false;
+        selected.prefix = '';
+        selected.suffix = '';
+        document.querySelectorAll('.icon-btn').forEach(button => {
+          button.removeAttribute('aria-pressed');
+          button.style.borderColor = '';
+          button.style.background = '';
+        });
+        generate();
+        source.focus();
+      });
+      document.querySelector('#copy').addEventListener('click', async () => {
+        if (!output.value) { showToast('Önce bir metin oluşturun.'); return; }
+        try {
+          await navigator.clipboard.writeText(output.value);
+        } catch {
+          output.focus();
+          output.select();
+          document.execCommand('copy');
+          output.setSelectionRange(0, 0);
+        }
+        showToast('Kopyalandı!');
+      });
+    })();
+  </script>
+</body>
+</html>
