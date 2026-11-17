@@ -31,7 +31,13 @@
     button, input, textarea, select { font: inherit; }
     button { cursor: pointer; }
     .page { width: min(100% - 32px, 920px); margin: 0 auto; padding: 48px 0 40px; }
-    header { text-align: center; margin-bottom: 30px; }
+    header { position: relative; text-align: center; margin-bottom: 30px; }
+    .language-switcher {
+      position: absolute; right: 0; top: 0;
+      width: 92px; height: 40px; padding: 0 30px 0 10px;
+      color: #555b70; border: 1px solid var(--line); border-radius: 10px;
+      background: #fff; font-size: 12px; font-weight: 700;
+    }
     .brand-mark {
       display: inline-grid; place-items: center; width: 52px; height: 52px; margin-bottom: 14px;
       border-radius: 17px; color: white; font-size: 25px;
@@ -57,7 +63,7 @@
     textarea::placeholder, input::placeholder { color: #a7adbd; }
     textarea:focus, input:focus, select:focus { border-color: #928bff; box-shadow: 0 0 0 3px #6258e81b; }
     .inline { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    input[type="number"], input[type="text"], select { height: 44px; padding: 0 12px; }
+    input[type="number"], input[type="text"] { height: 44px; padding: 0 12px; }
     .number-wrap { position: relative; }
     .number-wrap input { padding-right: 58px; }
     .number-wrap .max { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #9aa0b1; font-size: 11px; pointer-events: none; }
@@ -108,8 +114,9 @@
     .toast.show { opacity: 1; transform: translate(-50%, 0); }
     footer { padding-top: 18px; color: #9399a9; text-align: center; font-size: 12px; }
     @media (max-width: 680px) {
-      .page { width: min(100% - 22px, 520px); padding-top: 30px; }
+      .page { width: min(100% - 22px, 520px); padding-top: 72px; }
       header { margin-bottom: 22px; }
+      .language-switcher { position: absolute; right: 0; top: -55px; }
       .app { grid-template-columns: 1fr; gap: 25px; padding: 16px; border-radius: 19px; }
       #output { min-height: 230px; height: 230px; }
       .field { margin-bottom: 17px; }
@@ -125,70 +132,75 @@
 <body>
   <main class="page">
     <header>
+      <select id="languageSwitcher" class="language-switcher" aria-label="Dil seçimi">
+        <option value="tr">TR</option>
+        <option value="en">EN</option>
+        <option value="ru">RU</option>
+      </select>
       <div class="brand-mark" aria-hidden="true">↻</div>
-      <h1>Text Repeater</h1>
-      <p>Metnini yaz, tekrar sayısını belirle — gerisini biz halledelim.</p>
+      <h1 data-i18n="title">Text Repeater</h1>
+      <p data-i18n="subtitle">Metnini yaz, tekrar sayısını belirle — gerisini biz halledelim.</p>
     </header>
 
     <section class="app" aria-label="Metin tekrarlayıcı">
       <div class="panel">
         <div class="field">
-          <div class="label-row"><label for="source">Metniniz</label><span class="hint">Tekrarlanacak metni yazın</span></div>
+          <div class="label-row"><label for="source" data-i18n="sourceLabel">Metniniz</label><span class="hint" data-i18n="sourceHint">Tekrarlanacak metni yazın</span></div>
           <textarea id="source" placeholder="Örnek: Merhaba dünya!" spellcheck="false"></textarea>
         </div>
 
         <div class="field inline">
           <div>
-            <div class="label-row"><label for="repeatCount">Tekrar sayısı</label></div>
+            <div class="label-row"><label for="repeatCount" data-i18n="repeatLabel">Tekrar sayısı</label></div>
             <div class="number-wrap">
               <input id="repeatCount" type="number" value="5" min="1" max="10000" inputmode="numeric" aria-describedby="countHint">
               <span class="max">/ 10.000</span>
             </div>
           </div>
           <div>
-            <div class="label-row"><label for="separator">Ayırıcı</label></div>
+            <div class="label-row"><label for="separator" data-i18n="separatorLabel">Ayırıcı</label></div>
             <select id="separator">
-              <option value="newline">Yeni satır</option>
-              <option value="space">Boşluk</option>
-              <option value="comma">Virgül</option>
-              <option value="custom">Özel ayırıcı</option>
+              <option value="newline" data-i18n="newline">Yeni satır</option>
+              <option value="space" data-i18n="space">Boşluk</option>
+              <option value="comma" data-i18n="comma">Virgül</option>
+              <option value="custom" data-i18n="custom">Özel ayırıcı</option>
             </select>
             <div id="customWrap" class="custom-separator"><input id="customSeparator" type="text" placeholder="Ayırıcıyı yazın" aria-label="Özel ayırıcı"></div>
           </div>
         </div>
 
         <div class="decorations">
-          <span class="field-title">Metne simge ekle</span>
+          <span class="field-title" data-i18n="addIcon">Metne simge ekle</span>
           <div class="icon-controls">
-            <div class="icon-group"><span>Başına ekle</span><div class="icon-list" data-target="prefix" aria-label="Metnin başına simge ekle"></div></div>
-            <div class="icon-group"><span>Sonuna ekle</span><div class="icon-list" data-target="suffix" aria-label="Metnin sonuna simge ekle"></div></div>
+            <div class="icon-group"><span data-i18n="prefix">Başına ekle</span><div class="icon-list" data-target="prefix" aria-label="Metnin başına simge ekle"></div></div>
+            <div class="icon-group"><span data-i18n="suffix">Sonuna ekle</span><div class="icon-list" data-target="suffix" aria-label="Metnin sonuna simge ekle"></div></div>
           </div>
           <div class="checks">
-            <label class="check"><input id="numbered" type="checkbox"> Sıralı numara ekle</label>
-            <label class="check"><input id="reverse" type="checkbox"> Metni ters çevir</label>
+            <label class="check"><input id="numbered" type="checkbox"><span data-i18n="numbered"> Sıralı numara ekle</span></label>
+            <label class="check"><input id="reverse" type="checkbox"><span data-i18n="reverse"> Metni ters çevir</span></label>
           </div>
         </div>
 
         <div class="actions">
-          <button id="generate" class="btn btn-primary" type="button"><span aria-hidden="true">✦</span> Metni oluştur</button>
-          <button id="clear" class="btn btn-quiet" type="button"><span aria-hidden="true">⌫</span> Temizle</button>
+          <button id="generate" class="btn btn-primary" type="button"><span aria-hidden="true">✦</span> <span data-i18n="generate">Metni oluştur</span></button>
+          <button id="clear" class="btn btn-quiet" type="button"><span aria-hidden="true">⌫</span> <span data-i18n="clear">Temizle</span></button>
         </div>
       </div>
 
       <div class="panel">
         <div class="output-head">
-          <label class="output-title" for="output">Sonuç</label>
-          <button id="copy" class="copy-btn" type="button"><span aria-hidden="true">▢</span> Kopyala</button>
+          <label class="output-title" for="output" data-i18n="result">Sonuç</label>
+          <button id="copy" class="copy-btn" type="button"><span aria-hidden="true">▢</span> <span data-i18n="copy">Kopyala</span></button>
         </div>
         <textarea id="output" readonly placeholder="Oluşturduğunuz metin burada görünecek..." aria-live="polite"></textarea>
         <div class="stats" aria-label="Metin istatistikleri">
-          <div class="stat"><strong id="charCount">0</strong><span>Karakter</span></div>
-          <div class="stat"><strong id="wordCount">0</strong><span>Kelime</span></div>
+          <div class="stat"><strong id="charCount">0</strong><span data-i18n="characters">Karakter</span></div>
+          <div class="stat"><strong id="wordCount">0</strong><span data-i18n="words">Kelime</span></div>
         </div>
       </div>
     </section>
     <footer>
-      Ücretsiz, hızlı ve tamamen tarayıcınızda çalışır.<br>
+      <span data-i18n="footer">Ücretsiz, hızlı ve tamamen tarayıcınızda çalışır.</span><br>
       Made by ObsideX Studio
     </footer>
   </main>
@@ -196,6 +208,12 @@
 
   <script>
     (() => {
+      const translations = {
+        tr: { title:'Text Repeater', subtitle:'Metnini yaz, tekrar sayısını belirle — gerisini biz halledelim.', appLabel:'Metin tekrarlayıcı', sourceLabel:'Metniniz', sourceHint:'Tekrarlanacak metni yazın', sourcePlaceholder:'Örnek: Merhaba dünya!', repeatLabel:'Tekrar sayısı', separatorLabel:'Ayırıcı', newline:'Yeni satır', space:'Boşluk', comma:'Virgül', custom:'Özel ayırıcı', customPlaceholder:'Ayırıcıyı yazın', addIcon:'Metne simge ekle', prefix:'Başına ekle', suffix:'Sonuna ekle', numbered:'Sıralı numara ekle', reverse:'Metni ters çevir', generate:'Metni oluştur', clear:'Temizle', result:'Sonuç', copy:'Kopyala', outputPlaceholder:'Oluşturduğunuz metin burada görünecek...', characters:'Karakter', words:'Kelime', footer:'Ücretsiz, hızlı ve tamamen tarayıcınızda çalışır.', noText:'Önce bir metin oluşturun.', copied:'Kopyalandı!', iconPrefix:'başına', iconSuffix:'sonuna', iconAdd:'ekle', statsLabel:'Metin istatistikleri', pageTitle:'Text Repeater — Metin Tekrarlayıcı', description:'Metinlerinizi kolayca tekrarlayın, süsleyin ve kopyalayın.' },
+        en: { title:'Text Repeater', subtitle:'Write your text, choose the repeat count — we’ll handle the rest.', appLabel:'Text repeater', sourceLabel:'Your text', sourceHint:'Enter the text to repeat', sourcePlaceholder:'Example: Hello world!', repeatLabel:'Repeat count', separatorLabel:'Separator', newline:'New line', space:'Space', comma:'Comma', custom:'Custom separator', customPlaceholder:'Enter separator', addIcon:'Add an icon', prefix:'Add before', suffix:'Add after', numbered:'Add sequential numbers', reverse:'Reverse text', generate:'Generate text', clear:'Clear', result:'Result', copy:'Copy', outputPlaceholder:'Your generated text will appear here...', characters:'Characters', words:'Words', footer:'Free, fast, and runs entirely in your browser.', noText:'Generate text first.', copied:'Copied!', iconPrefix:'before', iconSuffix:'after', iconAdd:'Add', statsLabel:'Text statistics', pageTitle:'Text Repeater', description:'Repeat, decorate, and copy text easily.' },
+        ru: { title:'Повторитель текста', subtitle:'Введите текст и выберите количество повторов — остальное сделаем мы.', appLabel:'Повторитель текста', sourceLabel:'Ваш текст', sourceHint:'Введите текст для повторения', sourcePlaceholder:'Пример: Привет, мир!', repeatLabel:'Количество повторов', separatorLabel:'Разделитель', newline:'Новая строка', space:'Пробел', comma:'Запятая', custom:'Свой разделитель', customPlaceholder:'Введите разделитель', addIcon:'Добавить значок', prefix:'В начало', suffix:'В конец', numbered:'Добавить нумерацию', reverse:'Перевернуть текст', generate:'Создать текст', clear:'Очистить', result:'Результат', copy:'Копировать', outputPlaceholder:'Сгенерированный текст появится здесь...', characters:'Символы', words:'Слова', footer:'Бесплатно, быстро и полностью в вашем браузере.', noText:'Сначала создайте текст.', copied:'Скопировано!', iconPrefix:'в начало', iconSuffix:'в конец', iconAdd:'добавить', statsLabel:'Статистика текста', pageTitle:'Повторитель текста', description:'Легко повторяйте, оформляйте и копируйте текст.' }
+      };
+
       const icons = ['✨', '🔥', '👑', '★', '⚡'];
       const selected = { prefix: '', suffix: '' };
       const source = document.querySelector('#source');
@@ -209,7 +227,38 @@
       const charCount = document.querySelector('#charCount');
       const wordCount = document.querySelector('#wordCount');
       const toast = document.querySelector('#toast');
+      const languageSwitcher = document.querySelector('#languageSwitcher');
+      let currentLanguage = 'tr';
       let toastTimer;
+
+      function applyLanguage(language) {
+        const t = translations[language];
+        currentLanguage = language;
+        document.documentElement.lang = language;
+        document.title = t.pageTitle;
+        document.querySelector('meta[name="description"]').content = t.description;
+        document.querySelectorAll('[data-i18n]').forEach(element => {
+          const key = element.dataset.i18n;
+          if (t[key]) element.textContent = t[key];
+        });
+        source.placeholder = t.sourcePlaceholder;
+        output.placeholder = t.outputPlaceholder;
+        customSeparator.placeholder = t.customPlaceholder;
+        customSeparator.setAttribute('aria-label', t.custom);
+        document.querySelector('.app').setAttribute('aria-label', t.appLabel);
+        document.querySelector('.stats').setAttribute('aria-label', t.statsLabel);
+        document.querySelectorAll('.icon-list').forEach(group => {
+          group.setAttribute('aria-label', group.dataset.target === 'prefix' ? t.prefix : t.suffix);
+        });
+        document.querySelectorAll('.icon-btn').forEach(button => {
+          const target = button.closest('.icon-list').dataset.target;
+          button.title = `${button.textContent} ${target === 'prefix' ? t.iconPrefix : t.iconSuffix} ${t.iconAdd}`;
+          button.setAttribute('aria-label', button.title);
+        });
+        languageSwitcher.value = language;
+        localStorage.setItem('textRepeaterLanguage', language);
+        updateStats(output.value);
+      }
 
       document.querySelectorAll('.icon-list').forEach(group => {
         const target = group.dataset.target;
@@ -218,7 +267,7 @@
           button.type = 'button';
           button.className = 'icon-btn';
           button.textContent = icon;
-          button.title = `${icon} ${target === 'prefix' ? 'başına' : 'sonuna'} ekle`;
+          button.title = `${icon} ${target === 'prefix' ? translations[currentLanguage].iconPrefix : translations[currentLanguage].iconSuffix} ${translations[currentLanguage].iconAdd}`;
           button.setAttribute('aria-label', button.title);
           button.addEventListener('click', () => {
             selected[target] += icon;
@@ -261,9 +310,10 @@
       }
 
       function updateStats(text) {
-        charCount.textContent = Array.from(text).length.toLocaleString('tr-TR');
+        const locale = currentLanguage === 'tr' ? 'tr-TR' : currentLanguage === 'ru' ? 'ru-RU' : 'en-US';
+        charCount.textContent = Array.from(text).length.toLocaleString(locale);
         const words = text.trim() ? text.trim().split(/\s+/u).length : 0;
-        wordCount.textContent = words.toLocaleString('tr-TR');
+        wordCount.textContent = words.toLocaleString(locale);
       }
 
       function showToast(message) {
@@ -273,6 +323,7 @@
         toastTimer = setTimeout(() => toast.classList.remove('show'), 1900);
       }
 
+      languageSwitcher.addEventListener('change', () => applyLanguage(languageSwitcher.value));
       document.querySelector('#generate').addEventListener('click', generate);
       [source, count, separator, customSeparator, numbered, reverse].forEach(element => {
         element.addEventListener('input', generate);
@@ -300,7 +351,7 @@
         source.focus();
       });
       document.querySelector('#copy').addEventListener('click', async () => {
-        if (!output.value) { showToast('Önce bir metin oluşturun.'); return; }
+        if (!output.value) { showToast(translations[currentLanguage].noText); return; }
         try {
           await navigator.clipboard.writeText(output.value);
         } catch {
@@ -309,8 +360,12 @@
           document.execCommand('copy');
           output.setSelectionRange(0, 0);
         }
-        showToast('Kopyalandı!');
+        showToast(translations[currentLanguage].copied);
       });
+
+      const savedLanguage = localStorage.getItem('textRepeaterLanguage');
+      const browserLanguage = navigator.language.toLowerCase().startsWith('ru') ? 'ru' : navigator.language.toLowerCase().startsWith('tr') ? 'tr' : 'en';
+      applyLanguage(savedLanguage && translations[savedLanguage] ? savedLanguage : browserLanguage);
     })();
   </script>
 </body>
